@@ -1,5 +1,7 @@
 app.jar
-libs
+libs/
 META-INF
 manifest.txt
 lib
+token
+.vscode
