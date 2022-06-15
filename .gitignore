@@ -5,3 +5,4 @@ manifest.txt
 lib
 token
 .vscode
+out/
