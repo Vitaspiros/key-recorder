@@ -1,0 +1,7 @@
+.chart-plot-background {
+    -fx-background-color:transparent;
+}
+.bc {
+    -fx-background-color:rgb(0,2,17);
+    -fx-background-image:null
+}

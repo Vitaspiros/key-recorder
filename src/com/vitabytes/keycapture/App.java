@@ -1,7 +1,4 @@
 package com.vitabytes.keycapture;
-import java.util.*;
-import java.util.Map.Entry;
-
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 
@@ -11,9 +8,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 public class App extends Application {
 
@@ -21,17 +20,43 @@ public class App extends Application {
     Label clickLabel=new Label("Mouse clicked: "+Data.clicks);
     Label wheelDownLabel=new Label("Wheel moved down: "+Data.wheelDown);
     Label wheelUpLabel=new Label("Wheel moved up: "+Data.wheelUp);
+
+    String order="Descending";
+
+    BarChart<String,Number> bc;
     public void start(Stage stage) {
+        clickLabel.getStyleClass().add("label");
+        wheelDownLabel.getStyleClass().add("label");
+        wheelUpLabel.getStyleClass().add("label");
+
+        gp.getStyleClass().add("gp");
+
 
         stage.setTitle("Key Capture");
 
         Scene scene=new Scene(gp,640,600);
+        HBox hBox=new HBox(20);
+
+
+        // CSS
+        scene.getStylesheets().add(getClass().getResource("css/style.css").toExternalForm());
+
         Button btn1=new Button("Show Chart");
+        btn1.getStyleClass().add("btn");
+
+        ChoiceBox<String> orderBox=new ChoiceBox<String>();
+        orderBox.getStyleClass().add("btn"); // Yes, I know that this isn't a button
+        orderBox.setValue("Descending");
+        orderBox.getItems().addAll("Descending","Ascending");
+
+
+
         Button btn2=new Button("Update");
+        btn2.getStyleClass().add("btn");
         btn1.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
-                showChart();
+                ChartScreen.showChart(orderBox.getValue());
             }
         });
 
@@ -39,59 +64,30 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent event) {
                 Data.keyLabel.setText("Keys pressed: "+Data.keysPressed);
-                clickLabel.setText("Mouse clicked"+Data.clicks);
+                clickLabel.setText("Mouse clicked: "+Data.clicks);
                 wheelDownLabel.setText("Wheel moved down: "+Data.wheelDown);
                 wheelUpLabel.setText("Wheel moved up: "+Data.wheelUp);
             }
         });
+
+        hBox.getChildren().add(btn2);
+        hBox.getChildren().add(btn1);
+        hBox.getChildren().add(orderBox);
+
+        gp.add(hBox,2,5);
+
         gp.add(Data.keyLabel,0,0);
         gp.add(clickLabel,0,1);
         gp.add(wheelDownLabel,0,2);
         gp.add(wheelUpLabel,0,3);
-        gp.add(btn2,2,1);
-        gp.add(btn1,1,0);
+        //gp.add(btn2,1,5);
+        //gp.add(btn1,1,0);
 
         stage.setScene(scene);
         stage.show();
     }
 
-    void showChart() {
-        Stage stage=new Stage();
-        stage.setTitle("Key Chart");
-        // Create chart
-        final CategoryAxis xAxis=new CategoryAxis();
-        final NumberAxis yAxis=new NumberAxis();
-        final BarChart<String,Number> bc=new BarChart<String,Number>(xAxis,yAxis);
-        xAxis.setLabel("Keys");
-        yAxis.setLabel("Times");
-
-        XYChart.Series<String,Number> series=new XYChart.Series<String,Number>();
-
-        HashMap<String,Integer> keys=sortByValue(Data.keys);
-        keys.forEach((key,value) -> {
-            series.getData().add(new XYChart.Data<String,Number>(key,value));
-        });
-
-        bc.getData().add(series);
-        
-        Scene scene=new Scene(bc,640,600);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    // COPIED FROM STACK OVERFLOW
-
-    public static <K, V extends Comparable<? super V>> HashMap<K, V> sortByValue(HashMap<K, V> map) {
-        List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
-        list.sort(Entry.comparingByValue(Collections.reverseOrder())); // CHANGED LINE
-
-        HashMap<K, V> result = new LinkedHashMap<>();
-        for (Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-
-        return result;
-    }
+    
 
     @Override
     public void stop() {
