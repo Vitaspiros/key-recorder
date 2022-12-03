@@ -12,6 +12,10 @@ public class ChartScreen {
     static BarChart<String,Number> createChart(String order) {
         final CategoryAxis xAxis=new CategoryAxis();
         final NumberAxis yAxis=new NumberAxis();
+        yAxis.setTickUnit(1);
+        yAxis.setMinorTickVisible(false);
+        yAxis.setMinorTickCount(0);
+        yAxis.setTickLabelFormatter(new IntegerStringConverter());
         final BarChart<String,Number> bc=new BarChart<String,Number>(xAxis,yAxis);
         bc.getStyleClass().add("bc");
         xAxis.setLabel("Keys");
@@ -36,8 +40,9 @@ public class ChartScreen {
         Stage stage=new Stage();
         stage.setTitle("Key Chart");
         
-        
-        Scene scene=new Scene(createChart(order),640,600);
+        BarChart<String,Number> chart=createChart(order);
+        chart.setBarGap(0.0);
+        Scene scene=new Scene(chart,640,600);
 
         scene.getStylesheets().add(App.class.getResource("css/chart.css").toExternalForm());
 
@@ -49,12 +54,10 @@ public class ChartScreen {
 
     public static <K, V extends Comparable<? super V>> HashMap<K, V> sortByValue(HashMap<K, V> map,String order) {
         List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
-        System.out.println("Order: "+order);
         if (order.equals("Descending")) {
             list.sort(Entry.comparingByValue(Collections.reverseOrder())); // CHANGED LINE
         } else if (order.equals("Ascending")) {
             list.sort(Entry.comparingByValue());
-            System.out.println("ASCENDING ORDER");
         }
 
         HashMap<K, V> result = new LinkedHashMap<>();

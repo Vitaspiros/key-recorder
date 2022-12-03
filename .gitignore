@@ -6,3 +6,4 @@ lib
 token
 .vscode
 out/
+build.sh
